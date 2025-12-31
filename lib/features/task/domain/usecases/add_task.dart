@@ -6,7 +6,7 @@ import 'package:flutter_task_app/features/task/domain/entities/task_entity.dart'
 import 'package:flutter_task_app/features/task/domain/repositories/task_repository.dart';
 
 class AddTaskParams {
-  const AddTaskParams(this.taskEntity);
+  const AddTaskParams({required this.taskEntity});
   final TaskEntity taskEntity;
 }
 
