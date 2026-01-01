@@ -1,6 +1,6 @@
 class AppConstants {
   // API
-  static const String baseUrl = 'https://api.example.com';
+  static const String baseUrl = 'http://10.0.2.2:3000';
   static const Duration connectTimeout = Duration(seconds: 30);
 
   // Storage Keys
