@@ -235,7 +235,7 @@ void main() {
       when(
         mockRemoteDataSource.getTasks(),
       ).thenAnswer((_) async => [tTaskModel]);
-      when(mockLocalDataSource.cacheTasks(any)).thenAnswer((_) async => null);
+      when(mockLocalDataSource.cacheTasks(any)).thenAnswer((_) async {});
 
       final result = await repository.deleteTask('1');
 
