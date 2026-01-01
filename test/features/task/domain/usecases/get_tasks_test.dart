@@ -12,7 +12,7 @@ import 'get_tasks_test.mocks.dart';
 @GenerateMocks([TaskRepository])
 void main() {
   late MockTaskRepository mockTaskRepository;
-  late GetTasks getTasks;
+  late GetTasks useCase;
 
   final tTasks = [
     TaskEntity(
@@ -27,7 +27,7 @@ void main() {
 
   setUp(() {
     mockTaskRepository = MockTaskRepository();
-    getTasks = GetTasks(mockTaskRepository);
+    useCase = GetTasks(mockTaskRepository);
   });
 
   test('should get tasks from the repository', () async {
@@ -36,7 +36,7 @@ void main() {
 
     // Act
 
-    final result = await getTasks(const NoParams());
+    final result = await useCase(const NoParams());
 
     //Assert
     expect(result, Right(tTasks));
