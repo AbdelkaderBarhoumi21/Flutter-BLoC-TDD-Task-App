@@ -59,8 +59,7 @@ class _TaskFormState extends State<CustomTaskForm> {
   }
 
   @override
-  Widget build(BuildContext context) {
-    return Column(
+  Widget build(BuildContext context) => Column(
       mainAxisSize: MainAxisSize.min,
       children: [
         TextField(
@@ -81,7 +80,7 @@ class _TaskFormState extends State<CustomTaskForm> {
         ),
         const SizedBox(height: 16),
         DropdownButtonFormField<TaskPriority>(
-          value: _priority,
+          initialValue: _priority,
           decoration: const InputDecoration(
             labelText: 'Priority',
             border: OutlineInputBorder(),
@@ -102,7 +101,7 @@ class _TaskFormState extends State<CustomTaskForm> {
         ),
         const SizedBox(height: 16),
         DropdownButtonFormField<TaskStatus>(
-          value: _status,
+          initialValue: _status,
           decoration: const InputDecoration(
             labelText: 'Status',
             border: OutlineInputBorder(),
@@ -123,5 +122,4 @@ class _TaskFormState extends State<CustomTaskForm> {
         ),
       ],
     );
-  }
 }
