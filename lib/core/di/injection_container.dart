@@ -56,6 +56,6 @@ Future<void> init() async {
 
   final prefs = await SharedPreferences.getInstance();
   sl.registerLazySingleton(() => prefs);
-  sl.registerLazySingleton(() => http.Client());
-  sl.registerLazySingleton(() => Connectivity());
+  sl.registerLazySingleton(http.Client.new);
+  sl.registerLazySingleton(Connectivity.new);
 }
