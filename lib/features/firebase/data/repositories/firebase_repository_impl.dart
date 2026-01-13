@@ -12,10 +12,8 @@ import 'package:flutter_task_app/features/firebase/domain/entities/app_config_en
 import 'package:flutter_task_app/features/firebase/domain/entities/performance_trace_entity.dart';
 import 'package:flutter_task_app/features/firebase/domain/repositories/firebase_repository.dart';
 
-
 /// Implementation of Firebase Repository
 class FirebaseRepositoryImpl implements FirebaseRepository {
-
   FirebaseRepositoryImpl({
     required this.analyticsDataSource,
     required this.crashlyticsDataSource,
@@ -30,7 +28,9 @@ class FirebaseRepositoryImpl implements FirebaseRepository {
   // ==================== Analytics ====================
 
   @override
-  Future<Either<FirebaseFailure, Unit>> logEvent(AnalyticsEventEntity event) async {
+  Future<Either<FirebaseFailure, Unit>> logEvent(
+    AnalyticsEventEntity event,
+  ) async {
     try {
       await analyticsDataSource.logEvent(event);
       return const Right(unit);
@@ -219,7 +219,9 @@ class FirebaseRepositoryImpl implements FirebaseRepository {
   }
 
   @override
-  Future<Either<FirebaseFailure, Unit>> stopTrace(PerformanceTraceEntity trace) async {
+  Future<Either<FirebaseFailure, Unit>> stopTrace(
+    PerformanceTraceEntity trace,
+  ) async {
     try {
       await performanceDataSource.stopTrace(trace);
       return const Right(unit);

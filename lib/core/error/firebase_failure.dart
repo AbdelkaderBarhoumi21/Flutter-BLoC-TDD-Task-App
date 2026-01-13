@@ -1,12 +1,12 @@
-import 'package:equatable/equatable.dart';
+import 'package:flutter_task_app/core/error/failures.dart';
 
-abstract class FirebaseFailure extends Equatable {
-  const FirebaseFailure(this.message, [this.code]);
-  final String message;
+/// Base failure class for Firebase operations
+abstract class FirebaseFailure extends Failure {
+  const FirebaseFailure(super.message, [this.code]);
   final String? code;
 
   @override
-  List<Object?> get props => [message, code];
+  List<Object> get props => [message, code ?? ''];
 }
 
 /// Failure when Analytics operation fails
