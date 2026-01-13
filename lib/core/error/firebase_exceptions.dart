@@ -1,3 +1,9 @@
+///Exception Type → Failure Type
+///FirebaseAnalyticsException → AnalyticsFailure
+///FirebaseCrashlyticsException → CrashlyticsFailure
+///FirebasePerformanceException → PerformanceFailure
+///FirebaseRemoteConfigException → RemoteConfigFailure
+///Other exceptions → Respective failure with "Unexpected error" message
 abstract class AppFirebaseException implements Exception {
   const AppFirebaseException(this.message, [this.code]);
   final String message;

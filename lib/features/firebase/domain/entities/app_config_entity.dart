@@ -14,7 +14,8 @@ class AppConfigEntity extends Equatable {
   }
 
   /// Get value with default
-  T getValueOrDefault<T>(String key, T defaultValue) => getValue<T>(key) ?? defaultValue;
+  T getValueOrDefault<T>(String key, T defaultValue) =>
+      getValue<T>(key) ?? defaultValue;
   @override
   List<Object?> get props => [values];
 }
