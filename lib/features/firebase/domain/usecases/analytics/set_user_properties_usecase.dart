@@ -5,8 +5,8 @@ import 'package:flutter_task_app/core/usecases/usescase.dart';
 import 'package:flutter_task_app/features/firebase/domain/repositories/firebase_repository.dart';
 
 /// Use case for setting user properties
-class SetUserProperties implements UseCase<Unit, SetUserPropertiesParams> {
-  const SetUserProperties(this.repository);
+class SetUserPropertiesUseCase implements UseCase<Unit, SetUserPropertiesParams> {
+  const SetUserPropertiesUseCase(this.repository);
   final FirebaseRepository repository;
 
   @override

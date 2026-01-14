@@ -22,7 +22,7 @@ abstract class FirebasePerformanceDataSource {
 /// Implementation of Performance data source
 class FirebasePerformanceDataSourceImpl
     implements FirebasePerformanceDataSource {
-  const FirebasePerformanceDataSourceImpl(this.performanceService);
+  const FirebasePerformanceDataSourceImpl({required this.performanceService});
   final FirebasePerformanceService performanceService;
 
   @override
