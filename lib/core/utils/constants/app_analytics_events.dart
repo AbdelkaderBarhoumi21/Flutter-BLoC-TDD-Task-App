@@ -1,5 +1,6 @@
 /// Predefined analytics events
 class AppAnalyticsEvents {
+  const AppAnalyticsEvents._();
   // Screen views
   static const String screenView = 'screen_view';
   

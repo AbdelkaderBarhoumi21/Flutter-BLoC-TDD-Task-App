@@ -23,6 +23,7 @@ Future<void> init() async {
       addTask: sl(),
       updateTask: sl(),
       deleteTask: sl(),
+      logAnalyticsEventUseCase: sl()
     ),
   );
 

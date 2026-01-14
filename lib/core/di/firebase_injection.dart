@@ -130,5 +130,5 @@ Future<void> init() async {
 /// Reset all Firebase registrations (for testing)
 Future<void> reset() async {
   await sl.reset();
-  FirebaseInitializer.reset();
+  // FirebaseInitializer.reset();
 }
