@@ -3,21 +3,26 @@
 // Do not manually edit this file.
 
 // ignore_for_file: no_leading_underscores_for_library_prefixes
-import 'dart:async' as _i4;
+import 'dart:async' as _i5;
 
 import 'package:dartz/dartz.dart' as _i2;
-import 'package:flutter_task_app/core/error/failures.dart' as _i5;
-import 'package:flutter_task_app/core/usecases/usescase.dart' as _i7;
-import 'package:flutter_task_app/features/task/domain/entities/task_entity.dart'
-    as _i6;
-import 'package:flutter_task_app/features/task/domain/usecases/add_task.dart'
-    as _i8;
-import 'package:flutter_task_app/features/task/domain/usecases/delete_task.dart'
-    as _i10;
-import 'package:flutter_task_app/features/task/domain/usecases/get_tasks.dart'
+import 'package:flutter_task_app/core/error/failures.dart' as _i6;
+import 'package:flutter_task_app/core/error/firebase_failure.dart' as _i13;
+import 'package:flutter_task_app/core/usecases/usescase.dart' as _i8;
+import 'package:flutter_task_app/features/firebase/domain/repositories/firebase_repository.dart'
     as _i3;
-import 'package:flutter_task_app/features/task/domain/usecases/update_task.dart'
+import 'package:flutter_task_app/features/firebase/domain/usecases/analytics/log_analytics_event_usecase.dart'
+    as _i12;
+import 'package:flutter_task_app/features/task/domain/entities/task_entity.dart'
+    as _i7;
+import 'package:flutter_task_app/features/task/domain/usecases/add_task.dart'
     as _i9;
+import 'package:flutter_task_app/features/task/domain/usecases/delete_task.dart'
+    as _i11;
+import 'package:flutter_task_app/features/task/domain/usecases/get_tasks.dart'
+    as _i4;
+import 'package:flutter_task_app/features/task/domain/usecases/update_task.dart'
+    as _i10;
 import 'package:mockito/mockito.dart' as _i1;
 
 // ignore_for_file: type=lint
@@ -40,101 +45,144 @@ class _FakeEither_0<L, R> extends _i1.SmartFake implements _i2.Either<L, R> {
     : super(parent, parentInvocation);
 }
 
+class _FakeFirebaseRepository_1 extends _i1.SmartFake
+    implements _i3.FirebaseRepository {
+  _FakeFirebaseRepository_1(Object parent, Invocation parentInvocation)
+    : super(parent, parentInvocation);
+}
+
 /// A class which mocks [GetTasks].
 ///
 /// See the documentation for Mockito's code generation for more information.
-class MockGetTasks extends _i1.Mock implements _i3.GetTasks {
+class MockGetTasks extends _i1.Mock implements _i4.GetTasks {
   MockGetTasks() {
     _i1.throwOnMissingStub(this);
   }
 
   @override
-  _i4.Future<_i2.Either<_i5.Failure, List<_i6.TaskEntity>>> call(
-    _i7.NoParams? params,
+  _i5.Future<_i2.Either<_i6.Failure, List<_i7.TaskEntity>>> call(
+    _i8.NoParams? params,
   ) =>
       (super.noSuchMethod(
             Invocation.method(#call, [params]),
             returnValue:
-                _i4.Future<_i2.Either<_i5.Failure, List<_i6.TaskEntity>>>.value(
-                  _FakeEither_0<_i5.Failure, List<_i6.TaskEntity>>(
+                _i5.Future<_i2.Either<_i6.Failure, List<_i7.TaskEntity>>>.value(
+                  _FakeEither_0<_i6.Failure, List<_i7.TaskEntity>>(
                     this,
                     Invocation.method(#call, [params]),
                   ),
                 ),
           )
-          as _i4.Future<_i2.Either<_i5.Failure, List<_i6.TaskEntity>>>);
+          as _i5.Future<_i2.Either<_i6.Failure, List<_i7.TaskEntity>>>);
 }
 
 /// A class which mocks [AddTask].
 ///
 /// See the documentation for Mockito's code generation for more information.
-class MockAddTask extends _i1.Mock implements _i8.AddTask {
+class MockAddTask extends _i1.Mock implements _i9.AddTask {
   MockAddTask() {
     _i1.throwOnMissingStub(this);
   }
 
   @override
-  _i4.Future<_i2.Either<_i5.Failure, _i6.TaskEntity>> call(
-    _i8.AddTaskParams? params,
+  _i5.Future<_i2.Either<_i6.Failure, _i7.TaskEntity>> call(
+    _i9.AddTaskParams? params,
   ) =>
       (super.noSuchMethod(
             Invocation.method(#call, [params]),
             returnValue:
-                _i4.Future<_i2.Either<_i5.Failure, _i6.TaskEntity>>.value(
-                  _FakeEither_0<_i5.Failure, _i6.TaskEntity>(
+                _i5.Future<_i2.Either<_i6.Failure, _i7.TaskEntity>>.value(
+                  _FakeEither_0<_i6.Failure, _i7.TaskEntity>(
                     this,
                     Invocation.method(#call, [params]),
                   ),
                 ),
           )
-          as _i4.Future<_i2.Either<_i5.Failure, _i6.TaskEntity>>);
+          as _i5.Future<_i2.Either<_i6.Failure, _i7.TaskEntity>>);
 }
 
 /// A class which mocks [UpdateTask].
 ///
 /// See the documentation for Mockito's code generation for more information.
-class MockUpdateTask extends _i1.Mock implements _i9.UpdateTask {
+class MockUpdateTask extends _i1.Mock implements _i10.UpdateTask {
   MockUpdateTask() {
     _i1.throwOnMissingStub(this);
   }
 
   @override
-  _i4.Future<_i2.Either<_i5.Failure, _i6.TaskEntity>> call(
-    _i9.UpdateTaskParams? params,
+  _i5.Future<_i2.Either<_i6.Failure, _i7.TaskEntity>> call(
+    _i10.UpdateTaskParams? params,
   ) =>
       (super.noSuchMethod(
             Invocation.method(#call, [params]),
             returnValue:
-                _i4.Future<_i2.Either<_i5.Failure, _i6.TaskEntity>>.value(
-                  _FakeEither_0<_i5.Failure, _i6.TaskEntity>(
+                _i5.Future<_i2.Either<_i6.Failure, _i7.TaskEntity>>.value(
+                  _FakeEither_0<_i6.Failure, _i7.TaskEntity>(
                     this,
                     Invocation.method(#call, [params]),
                   ),
                 ),
           )
-          as _i4.Future<_i2.Either<_i5.Failure, _i6.TaskEntity>>);
+          as _i5.Future<_i2.Either<_i6.Failure, _i7.TaskEntity>>);
 }
 
 /// A class which mocks [DeleteTask].
 ///
 /// See the documentation for Mockito's code generation for more information.
-class MockDeleteTask extends _i1.Mock implements _i10.DeleteTask {
+class MockDeleteTask extends _i1.Mock implements _i11.DeleteTask {
   MockDeleteTask() {
     _i1.throwOnMissingStub(this);
   }
 
   @override
-  _i4.Future<_i2.Either<_i5.Failure, void>> call(
-    _i10.DeleteTaskParams? params,
+  _i5.Future<_i2.Either<_i6.Failure, void>> call(
+    _i11.DeleteTaskParams? params,
   ) =>
       (super.noSuchMethod(
             Invocation.method(#call, [params]),
-            returnValue: _i4.Future<_i2.Either<_i5.Failure, void>>.value(
-              _FakeEither_0<_i5.Failure, void>(
+            returnValue: _i5.Future<_i2.Either<_i6.Failure, void>>.value(
+              _FakeEither_0<_i6.Failure, void>(
                 this,
                 Invocation.method(#call, [params]),
               ),
             ),
           )
-          as _i4.Future<_i2.Either<_i5.Failure, void>>);
+          as _i5.Future<_i2.Either<_i6.Failure, void>>);
+}
+
+/// A class which mocks [LogAnalyticsEventUseCase].
+///
+/// See the documentation for Mockito's code generation for more information.
+class MockLogAnalyticsEventUseCase extends _i1.Mock
+    implements _i12.LogAnalyticsEventUseCase {
+  MockLogAnalyticsEventUseCase() {
+    _i1.throwOnMissingStub(this);
+  }
+
+  @override
+  _i3.FirebaseRepository get repository =>
+      (super.noSuchMethod(
+            Invocation.getter(#repository),
+            returnValue: _FakeFirebaseRepository_1(
+              this,
+              Invocation.getter(#repository),
+            ),
+          )
+          as _i3.FirebaseRepository);
+
+  @override
+  _i5.Future<_i2.Either<_i13.FirebaseFailure, _i2.Unit>> call(
+    _i12.LogAnalyticsEventParams? params,
+  ) =>
+      (super.noSuchMethod(
+            Invocation.method(#call, [params]),
+            returnValue:
+                _i5.Future<_i2.Either<_i13.FirebaseFailure, _i2.Unit>>.value(
+                  _FakeEither_0<_i13.FirebaseFailure, _i2.Unit>(
+                    this,
+                    Invocation.method(#call, [params]),
+                  ),
+                ),
+          )
+          as _i5.Future<_i2.Either<_i13.FirebaseFailure, _i2.Unit>>);
 }

@@ -1,5 +1,6 @@
 import 'package:dartz/dartz.dart';
 import 'package:flutter_task_app/core/error/failures.dart';
+import 'package:flutter_task_app/features/firebase/domain/usecases/analytics/log_analytics_event_usecase.dart';
 import 'package:flutter_task_app/features/task/domain/entities/task_entity.dart';
 import 'package:flutter_task_app/features/task/domain/usecases/add_task.dart';
 import 'package:flutter_task_app/features/task/domain/usecases/delete_task.dart';
@@ -14,13 +15,20 @@ import 'package:mockito/mockito.dart';
 
 import 'task_bloc_test.mocks.dart';
 
-@GenerateMocks([GetTasks, AddTask, UpdateTask, DeleteTask])
+@GenerateMocks([
+  GetTasks,
+  AddTask,
+  UpdateTask,
+  DeleteTask,
+  LogAnalyticsEventUseCase,
+])
 void main() {
   late TaskBloc bloc;
   late MockGetTasks mockGetTasks;
   late MockAddTask mockAddTask;
   late MockUpdateTask mockUpdateTask;
   late MockDeleteTask mockDeleteTask;
+  late MockLogAnalyticsEventUseCase mockLogAnalyticsEventUseCase;
 
   final tTask = TaskEntity(
     id: '1',
@@ -36,11 +44,13 @@ void main() {
     mockAddTask = MockAddTask();
     mockUpdateTask = MockUpdateTask();
     mockDeleteTask = MockDeleteTask();
+    mockLogAnalyticsEventUseCase = MockLogAnalyticsEventUseCase();
     bloc = TaskBloc(
       getTasks: mockGetTasks,
       addTask: mockAddTask,
       updateTask: mockUpdateTask,
       deleteTask: mockDeleteTask,
+      logAnalyticsEventUseCase: mockLogAnalyticsEventUseCase,
     );
   });
 

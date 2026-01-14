@@ -68,8 +68,8 @@ class TaskBloc extends Bloc<TaskEvent, TaskState> {
               name: AppAnalyticsEvents.taskAdded,
               parameters: {
                 AppAnalyticsParameters.taskId: event.task.id,
-                AppAnalyticsParameters.taskPriority: event.task.priority,
-                AppAnalyticsParameters.taskStatus: event.task.status,
+                AppAnalyticsParameters.taskPriority: event.task.priority.name,
+                AppAnalyticsParameters.taskStatus: event.task.status.name,
                 AppAnalyticsParameters.timestamp: DateTime.now()
                     .toIso8601String(),
               },

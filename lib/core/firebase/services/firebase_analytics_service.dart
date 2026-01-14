@@ -7,7 +7,7 @@ abstract class FirebaseAnalyticsService {
   /// Log a custom event
   Future<void> logEvent({
     required String name,
-    Map<String, Object?>? parameters,
+    Map<String, Object>? parameters,
   });
 
   /// Log screen view
@@ -33,13 +33,10 @@ class FirebaseAnalyticsServiceImpl implements FirebaseAnalyticsService {
   @override
   Future<void> logEvent({
     required String name,
-    Map<String, Object?>? parameters,
+    Map<String, Object>? parameters,
   }) async {
     try {
-      await _analytics.logEvent(
-        name: name,
-        parameters: parameters as Map<String, Object>?,
-      );
+      await _analytics.logEvent(name: name, parameters: parameters);
       if (kDebugMode) {
         debugPrint('Analytics Event: $name with params: $parameters');
       }
