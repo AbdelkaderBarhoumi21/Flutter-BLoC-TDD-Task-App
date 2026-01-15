@@ -1,13 +1,37 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_task_app/core/di/firebase_injection.dart'
+    as firebase_di;
 import 'package:flutter_task_app/core/utils/functions/app_functions.dart';
+import 'package:flutter_task_app/features/firebase/domain/usecases/analytics/log_screen_view_usecase.dart';
 import 'package:flutter_task_app/features/task/presentation/bloc/task_bloc.dart';
 import 'package:flutter_task_app/features/task/presentation/bloc/task_event.dart';
 import 'package:flutter_task_app/features/task/presentation/bloc/task_state.dart';
 import 'package:flutter_task_app/features/task/presentation/widgets/custom_task_item.dart';
 
-class TaskPage extends StatelessWidget {
+class TaskPage extends StatefulWidget {
   const TaskPage({super.key});
+
+  @override
+  State<TaskPage> createState() => _TaskPageState();
+}
+
+class _TaskPageState extends State<TaskPage> {
+  @override
+  void initState() {
+    _logScreenView();
+    super.initState();
+  }
+
+  Future<void> _logScreenView() async {
+    final logScreenView = firebase_di.sl<LogScreenViewUseCase>();
+    await logScreenView(
+      const LogScreenViewParams(
+        screenName: 'TaskPage',
+        screenClass: 'TaskListScreen',
+      ),
+    );
+  }
 
   @override
   Widget build(BuildContext context) => Scaffold(

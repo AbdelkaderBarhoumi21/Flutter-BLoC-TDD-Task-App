@@ -2,6 +2,8 @@ import 'package:dartz/dartz.dart';
 import 'package:flutter_task_app/core/error/exceptions.dart';
 import 'package:flutter_task_app/core/error/failures.dart';
 import 'package:flutter_task_app/core/network/network_info.dart';
+import 'package:flutter_task_app/features/firebase/domain/usecases/crashlytics/log_error_usecase.dart';
+import 'package:flutter_task_app/features/firebase/domain/usecases/crashlytics/set_custom_key_usecase.dart';
 import 'package:flutter_task_app/features/task/data/datasources/task_local_data_source.dart';
 import 'package:flutter_task_app/features/task/data/datasources/task_remote_data_source.dart';
 import 'package:flutter_task_app/features/task/data/models/task_model.dart';
@@ -13,14 +15,22 @@ class TaskRepositoryImpl implements TaskRepository {
     required this.networkInfo,
     required this.taskLocalDataSource,
     required this.taskRemoteDataSource,
+    required this.setCustomKeyUseCase,
+    required this.logErrorUseCase,
   });
   final TaskRemoteDataSource taskRemoteDataSource;
   final TaskLocalDataSource taskLocalDataSource;
   final NetworkInfo networkInfo;
+  final SetCustomKeyUseCase setCustomKeyUseCase;
+  final LogErrorUseCase logErrorUseCase;
   @override
   Future<Either<Failure, List<TaskEntity>>> getTasks() async {
     if (await networkInfo.isConnected) {
       try {
+        // Set additional context
+        await setCustomKeyUseCase(
+          const SetCustomKeyParams(key: 'operation', value: 'get_tasks'),
+        );
         final remoteTasks = await taskRemoteDataSource.getTasks();
         await taskLocalDataSource.cacheTasks(remoteTasks);
         return Right(remoteTasks);
@@ -28,7 +38,22 @@ class TaskRepositoryImpl implements TaskRepository {
         return Left(ServerFailure(e.message));
       } on NetworkException catch (e) {
         return left(NetworkFailure(e.message));
-      } catch (e) {
+      } catch (e, stackTrace) {
+        // Log error with context
+        await logErrorUseCase(
+          LogErrorParams(
+            error: e,
+            stackTrace: stackTrace,
+            reason: 'Failed to fetch task from remote data source',
+          ),
+        );
+        // Set additional context
+        await setCustomKeyUseCase(
+          SetCustomKeyParams(
+            key: 'error_timestamp',
+            value: DateTime.now().toIso8601String(),
+          ),
+        );
         return Left(UnexpectedFailure(e.toString()));
       }
     } else {

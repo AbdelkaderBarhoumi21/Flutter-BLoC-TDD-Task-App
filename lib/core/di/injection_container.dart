@@ -39,6 +39,8 @@ Future<void> init() async {
       networkInfo: sl(),
       taskLocalDataSource: sl(),
       taskRemoteDataSource: sl(),
+      setCustomKeyUseCase: sl(),
+      logErrorUseCase: sl(),
     ),
   );
 
