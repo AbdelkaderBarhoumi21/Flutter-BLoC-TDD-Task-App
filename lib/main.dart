@@ -1,15 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_task_app/core/di/firebase_injection.dart'
     as firebase_di;
 import 'package:flutter_task_app/core/di/injection_container.dart' as di;
+import 'package:flutter_task_app/core/my_app/my_app.dart';
 import 'package:flutter_task_app/core/utils/constants/app_analytics_events.dart';
 import 'package:flutter_task_app/features/firebase/domain/entities/analytics_event_entity.dart';
 import 'package:flutter_task_app/features/firebase/domain/usecases/analytics/log_analytics_event_usecase.dart';
-import 'package:flutter_task_app/features/task/presentation/bloc/task_bloc.dart';
-import 'package:flutter_task_app/features/task/presentation/bloc/task_event.dart';
-import 'package:flutter_task_app/features/task/presentation/pages/task_page.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -48,22 +45,4 @@ Future<void> main() async {
   }
 
   runApp(const MyApp());
-}
-
-class MyApp extends StatelessWidget {
-  const MyApp({super.key});
-
-  @override
-  Widget build(BuildContext context) => MaterialApp(
-    title: 'Clean Architecture Task App',
-    debugShowCheckedModeBanner: false,
-    theme: ThemeData(
-      colorScheme: ColorScheme.fromSeed(seedColor: Colors.blue),
-      useMaterial3: true,
-    ),
-    home: BlocProvider(
-      create: (_) => di.sl<TaskBloc>()..add(const LoadTaskEvent()),
-      child: const TaskPage(),
-    ),
-  );
 }
