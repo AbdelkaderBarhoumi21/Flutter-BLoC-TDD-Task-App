@@ -3,6 +3,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_task_app/core/di/firebase_injection.dart'
     as firebase_di;
 import 'package:flutter_task_app/core/di/injection_container.dart' as di;
+import 'package:flutter_task_app/core/error/global_error_handler.dart';
 import 'package:flutter_task_app/core/my_app/my_app.dart';
 import 'package:flutter_task_app/core/utils/constants/app_analytics_events.dart';
 import 'package:flutter_task_app/features/firebase/domain/entities/analytics_event_entity.dart';
@@ -10,6 +11,7 @@ import 'package:flutter_task_app/features/firebase/domain/usecases/analytics/log
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  GlobalErrorHandler.initialize();
   await SystemChrome.setPreferredOrientations([
     DeviceOrientation.portraitUp,
     DeviceOrientation.portraitDown,
