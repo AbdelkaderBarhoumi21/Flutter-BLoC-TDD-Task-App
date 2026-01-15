@@ -3,7 +3,10 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_task_app/core/di/firebase_injection.dart'
     as firebase_di;
 import 'package:flutter_task_app/core/utils/functions/app_functions.dart';
+import 'package:flutter_task_app/features/firebase/domain/entities/performance_trace_entity.dart';
 import 'package:flutter_task_app/features/firebase/domain/usecases/analytics/log_screen_view_usecase.dart';
+import 'package:flutter_task_app/features/firebase/domain/usecases/performance/start_trace_usecase.dart';
+import 'package:flutter_task_app/features/firebase/domain/usecases/performance/stop_trace_usecase.dart';
 import 'package:flutter_task_app/features/task/presentation/bloc/task_bloc.dart';
 import 'package:flutter_task_app/features/task/presentation/bloc/task_event.dart';
 import 'package:flutter_task_app/features/task/presentation/bloc/task_state.dart';
@@ -17,10 +20,18 @@ class TaskPage extends StatefulWidget {
 }
 
 class _TaskPageState extends State<TaskPage> {
+  PerformanceTraceEntity? _screenTrace;
   @override
   void initState() {
     _logScreenView();
+    _startScreenTrace();
     super.initState();
+  }
+
+  @override
+  void dispose() {
+    _stopScreenTrace();
+    super.dispose();
   }
 
   Future<void> _logScreenView() async {
@@ -30,6 +41,25 @@ class _TaskPageState extends State<TaskPage> {
         screenName: 'TaskPage',
         screenClass: 'TaskListScreen',
       ),
+    );
+  }
+
+  Future<void> _stopScreenTrace() async {
+    if (_screenTrace != null) {
+      final stopTrace = firebase_di.sl<StopTraceUseCase>();
+      await stopTrace(StopTraceParams(trace: _screenTrace!));
+      _screenTrace = null;
+    }
+  }
+
+  Future<void> _startScreenTrace() async {
+    final startTrace = firebase_di.sl<StartTraceUseCase>();
+    final result = await startTrace(
+      const StartTraceParams(name: 'task_page_load'),
+    );
+    result.fold(
+      (failure) => debugPrint('Failed to start trace: ${failure.message}'),
+      (trace) => _screenTrace = trace,
     );
   }
 
@@ -47,9 +77,12 @@ class _TaskPageState extends State<TaskPage> {
     body: BlocConsumer<TaskBloc, TaskState>(
       listener: (context, state) {
         if (state is TaskError) {
+          _stopScreenTrace();
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(content: Text(state.message), backgroundColor: Colors.red),
           );
+        } else if (state is TaskLoaded) {
+          _stopScreenTrace();
         } else if (state is TaskOperationSuccess) {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
