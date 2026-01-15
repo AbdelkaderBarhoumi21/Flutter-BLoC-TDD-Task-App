@@ -1,4 +1,3 @@
-import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -11,7 +10,6 @@ import 'package:flutter_task_app/features/firebase/domain/usecases/analytics/log
 import 'package:flutter_task_app/features/task/presentation/bloc/task_bloc.dart';
 import 'package:flutter_task_app/features/task/presentation/bloc/task_event.dart';
 import 'package:flutter_task_app/features/task/presentation/pages/task_page.dart';
-import 'package:flutter_task_app/firebase_options.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -19,18 +17,6 @@ Future<void> main() async {
     DeviceOrientation.portraitUp,
     DeviceOrientation.portraitDown,
   ]);
-  // Initialize Firebase
-  try {
-    await Firebase.initializeApp(
-      options: DefaultFirebaseOptions.currentPlatform,
-    );
-    debugPrint(
-      '===================Firebase initialized successfully====================',
-    );
-  } catch (e, stackTrace) {
-    debugPrint('Firebase initialization failed: $e');
-    debugPrint(stackTrace.toString());
-  }
   // Initialize dependency injection
   try {
     await di.init();
