@@ -3,6 +3,9 @@ import 'dart:convert';
 
 import 'package:flutter_task_app/core/error/exceptions.dart';
 import 'package:flutter_task_app/core/utils/constants/app_constants.dart';
+import 'package:flutter_task_app/features/firebase/domain/usecases/performance/add_trace_metric_usecase.dart';
+import 'package:flutter_task_app/features/firebase/domain/usecases/performance/start_trace_usecase.dart';
+import 'package:flutter_task_app/features/firebase/domain/usecases/performance/stop_trace_usecase.dart';
 import 'package:flutter_task_app/features/task/data/models/task_model.dart';
 import 'package:http/http.dart' as http;
 
@@ -15,8 +18,16 @@ abstract class TaskRemoteDataSource {
 }
 
 class TaskRemoteDataSourceImpl implements TaskRemoteDataSource {
-  const TaskRemoteDataSourceImpl({required this.client});
+  const TaskRemoteDataSourceImpl({
+    required this.client,
+    required this.startTraceUseCase,
+    required this.stopTraceUseCase,
+    required this.addTraceMetricUseCase,
+  });
   final http.Client client;
+  final StartTraceUseCase startTraceUseCase;
+  final StopTraceUseCase stopTraceUseCase;
+  final AddTraceMetricUseCase addTraceMetricUseCase;
 
   Uri _uri(String path) => Uri.parse('${AppConstants.baseUrl}$path');
 
@@ -27,18 +38,54 @@ class TaskRemoteDataSourceImpl implements TaskRemoteDataSource {
   @override
   Future<List<TaskModel>> getTasks() async {
     try {
-      final response = await client
-          .get(_uri('/tasks'), headers: _headers)
-          .timeout(AppConstants.connectTimeout);
+      // Start performance trace
+      final traceResult = await startTraceUseCase(
+        const StartTraceParams(name: 'fetch_tasks_api'),
+      );
+      final trace = traceResult.getOrElse(
+        () => throw Exception('Failed to start trace'),
+      ); // Get value if Right or throw exception if left and next line doesn't execute
 
-      if (response.statusCode == 200) {
-        final List<dynamic> jsonList =
-            json.decode(response.body) as List<dynamic>;
-        return jsonList
-            .map((e) => TaskModel.fromJson(e as Map<String, dynamic>))
-            .toList();
+      try {
+        final startTime = DateTime.now();
+        final endTime = DateTime.now();
+        final duration = endTime.difference(startTime).inMilliseconds;
+
+        final response = await client
+            .get(_uri('/tasks'), headers: _headers)
+            .timeout(AppConstants.connectTimeout);
+        // Add metric
+        await addTraceMetricUseCase(
+          AddTraceMetricParams(
+            trace: trace,
+            metricName: 'response_time_ms',
+            value: duration,
+          ),
+        );
+
+        await addTraceMetricUseCase(
+          AddTraceMetricParams(
+            trace: trace,
+            metricName: 'response_size_bytes',
+            value: response.body.length,
+          ),
+        );
+        // Stop trace
+        await stopTraceUseCase(StopTraceParams(trace: trace));
+
+        if (response.statusCode == 200) {
+          final List<dynamic> jsonList =
+              json.decode(response.body) as List<dynamic>;
+          return jsonList
+              .map((e) => TaskModel.fromJson(e as Map<String, dynamic>))
+              .toList();
+        }
+        throw ServerException('Failed to load tasks: ${response.statusCode}');
+      } catch (e) {
+        // Stop trace on error
+        await stopTraceUseCase(StopTraceParams(trace: trace));
+        rethrow;
       }
-      throw ServerException('Failed to load tasks: ${response.statusCode}');
     } on http.ClientException {
       throw const NetworkException();
     } on TimeoutException {

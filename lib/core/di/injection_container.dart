@@ -23,7 +23,7 @@ Future<void> init() async {
       addTask: sl(),
       updateTask: sl(),
       deleteTask: sl(),
-      logAnalyticsEventUseCase: sl()
+      logAnalyticsEventUseCase: sl(),
     ),
   );
 
@@ -46,7 +46,12 @@ Future<void> init() async {
 
   // Data sources
   sl.registerLazySingleton<TaskRemoteDataSource>(
-    () => TaskRemoteDataSourceImpl(client: sl()),
+    () => TaskRemoteDataSourceImpl(
+      client: sl(),
+      startTraceUseCase: sl(),
+      stopTraceUseCase: sl(),
+      addTraceMetricUseCase: sl(),
+    ),
   );
   sl.registerLazySingleton<TaskLocalDataSource>(
     () => TaskLocalDataSourceImpl(sharedPreferences: sl()),
