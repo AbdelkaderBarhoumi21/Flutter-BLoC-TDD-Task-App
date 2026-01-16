@@ -1,7 +1,11 @@
+import 'dart:async';
+
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_task_app/core/di/firebase_injection.dart'
     as firebase_di;
+import 'package:flutter_task_app/core/services/settings_service.dart';
 import 'package:flutter_task_app/core/utils/functions/app_functions.dart';
 import 'package:flutter_task_app/features/firebase/domain/entities/performance_trace_entity.dart';
 import 'package:flutter_task_app/features/firebase/domain/usecases/analytics/log_screen_view_usecase.dart';
@@ -25,6 +29,7 @@ class _TaskPageState extends State<TaskPage> {
   void initState() {
     _logScreenView();
     _startScreenTrace();
+    unawaited(_logMaxTasksPerUser());
     super.initState();
   }
 
@@ -61,6 +66,14 @@ class _TaskPageState extends State<TaskPage> {
       (failure) => debugPrint('Failed to start trace: ${failure.message}'),
       (trace) => _screenTrace = trace,
     );
+  }
+
+  Future<void> _logMaxTasksPerUser() async {
+    final settings = SettingsService();
+    final maxTasks = await settings.maxTasksPerUser;
+    if (kDebugMode) {
+      debugPrint('Remote Config max_tasks_per_user: $maxTasks');
+    }
   }
 
   @override

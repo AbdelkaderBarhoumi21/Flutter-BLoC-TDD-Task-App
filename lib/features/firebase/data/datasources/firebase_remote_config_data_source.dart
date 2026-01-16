@@ -23,24 +23,28 @@ class FirebaseRemoteConfigDataSourceImpl
 
   @override
   dynamic getValue(String key) {
-    // Try to determine the type and return appropriate value
-    try {
-      // First try as bool
-      return remoteConfigService.getBool(key);
-    } catch (_) {
-      try {
-        // Try as int
-        return remoteConfigService.getInt(key);
-      } catch (_) {
-        try {
-          // Try as double
-          return remoteConfigService.getDouble(key);
-        } catch (_) {
-          // Default to string
-          return remoteConfigService.getString(key);
-        }
-      }
+    final rawValue = remoteConfigService.getString(key);
+    return _parseConfigValue(rawValue);
+  }
+
+  dynamic _parseConfigValue(String rawValue) {
+    final trimmed = rawValue.trim();
+    final normalized = trimmed.toLowerCase();
+    if (normalized == 'true') {
+      return true;
     }
+    if (normalized == 'false') {
+      return false;
+    }
+    final intValue = int.tryParse(trimmed);
+    if (intValue != null) {
+      return intValue;
+    }
+    final doubleValue = double.tryParse(trimmed);
+    if (doubleValue != null) {
+      return doubleValue;
+    }
+    return rawValue;
   }
 
   @override
