@@ -85,14 +85,13 @@ class TaskBloc extends Bloc<TaskEvent, TaskState> {
       SetCustomKeyParams(key: 'max_tasks', value: maxTasks),
     );
     final result = await getTasks(const NoParams());
-    result.fold(
+    await result.fold<Future<void>>(
       (failure) async {
         // Log error
         await logErrorUseCase(
           LogErrorParams(error: failure, reason: 'Failed to load tasks'),
         );
         // Log analytics
-
         await logAnalyticsEventUseCase(
           LogAnalyticsEventParams(
             event: AnalyticsEventEntity(
@@ -110,10 +109,13 @@ class TaskBloc extends Bloc<TaskEvent, TaskState> {
           await stopTraceUseCase(StopTraceParams(trace: trace));
         }
 
+        if (emit.isDone) {
+          return;
+        }
         emit(TaskError(failure.message));
       },
       (tasks) async {
-        //Add metric to trace
+        // Add metric to trace
         if (traceResult.isRight()) {
           final trace = traceResult.getOrElse(() => throw Exception());
           await addTraceMetricUseCase(
@@ -134,6 +136,9 @@ class TaskBloc extends Bloc<TaskEvent, TaskState> {
             ),
           ),
         );
+        if (emit.isDone) {
+          return;
+        }
         emit(TaskLoaded(tasks));
       },
     );
@@ -151,7 +156,7 @@ class TaskBloc extends Bloc<TaskEvent, TaskState> {
 
     emit(const TaskLoading());
     final result = await addTask(AddTaskParams(taskEntity: event.task));
-    result.fold(
+    await result.fold<Future<void>>(
       (failure) async {
         // Log error
         await logErrorUseCase(
@@ -174,7 +179,9 @@ class TaskBloc extends Bloc<TaskEvent, TaskState> {
           final trace = traceResult.getOrElse(() => throw Exception());
           await stopTraceUseCase(StopTraceParams(trace: trace));
         }
-
+        if (emit.isDone) {
+          return;
+        }
         emit(TaskError(failure.message));
       },
       (_) async {
@@ -193,6 +200,9 @@ class TaskBloc extends Bloc<TaskEvent, TaskState> {
             ),
           ),
         );
+        if (emit.isDone) {
+          return;
+        }
         emit(const TaskOperationSuccess('Task added successfully'));
         add(const LoadTaskEvent());
       },
