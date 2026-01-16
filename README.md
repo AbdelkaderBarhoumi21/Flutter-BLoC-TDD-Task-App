@@ -219,23 +219,6 @@ GitHub Actions workflow included:
 - ✅ Generate coverage report
 - ✅ Runs on push/PR to main branch
 
-## 🤝 Contributing
-
-1. Fork the project
-2. Create your feature branch (`git checkout -b feature/AmazingFeature`)
-3. Commit your changes (`git commit -m 'Add some AmazingFeature'`)
-4. Push to the branch (`git push origin feature/AmazingFeature`)
-5. Open a Pull Request
-
-## 📄 License
-
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
-
-## 👨‍💻 Author
-
-**Your Name**
-- GitHub: [@yourusername](https://github.com/yourusername)
-- LinkedIn: [Your Name](https://linkedin.com/in/yourprofile)
 
 ## 🙏 Acknowledgments
 
@@ -245,13 +228,7 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 ---
 
-⭐ If you found this project helpful, please give it a star!
 
-## 📸 Screenshots
-
-[Add screenshots here]
-
-## 🔗 Related Projects
 
 - [Another Flutter Project](https://github.com/...)
 - [Clean Architecture Example](https://github.com/...)
