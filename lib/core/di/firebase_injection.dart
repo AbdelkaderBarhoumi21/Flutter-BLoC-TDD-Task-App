@@ -122,7 +122,7 @@ Future<void> init() async {
 
   // ==================== Use Cases - Remote Config ====================
 
-  sl.registerLazySingleton(() => FetchRemoteConfig(sl()));
+  sl.registerLazySingleton(() => FetchRemoteConfigUseCase(sl()));
   sl.registerLazySingleton(() => GetConfigValueUseCase(sl()));
   sl.registerLazySingleton(() => GetAllConfigUseCase(sl()));
 }

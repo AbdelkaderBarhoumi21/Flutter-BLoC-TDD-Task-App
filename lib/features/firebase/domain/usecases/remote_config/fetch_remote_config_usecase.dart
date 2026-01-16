@@ -5,8 +5,8 @@ import 'package:flutter_task_app/core/usecases/usescase.dart';
 import 'package:flutter_task_app/features/firebase/domain/repositories/firebase_repository.dart';
 
 /// Use case for fetching and activating remote config
-class FetchRemoteConfig implements UseCase<bool, FetchRemoteConfigParams> {
-  const FetchRemoteConfig(this.repository);
+class FetchRemoteConfigUseCase implements UseCase<bool, FetchRemoteConfigParams> {
+  const FetchRemoteConfigUseCase(this.repository);
   final FirebaseRepository repository;
 
   @override

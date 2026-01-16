@@ -57,9 +57,9 @@ class FirebaseRemoteConfigServiceImpl implements FirebaseRemoteConfigService {
   }
 
   @override
-  Future<bool> activate() {
+  Future<bool> activate() async {
     try {
-      final activated = _remoteConfig.activate();
+      final activated = await _remoteConfig.activate();
       if (kDebugMode) {
         print('🔧 Remote Config activated: $activated');
       }
@@ -77,9 +77,9 @@ class FirebaseRemoteConfigServiceImpl implements FirebaseRemoteConfigService {
   }
 
   @override
-  Future<bool> fetchAndActivate() {
+  Future<bool> fetchAndActivate() async {
     try {
-      final activated = _remoteConfig.fetchAndActivate();
+      final activated = await _remoteConfig.fetchAndActivate();
       if (kDebugMode) {
         debugPrint('Remote Config fetch and activated: $activated');
       }

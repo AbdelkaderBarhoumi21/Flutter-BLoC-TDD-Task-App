@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_crashlytics/firebase_crashlytics.dart';
 import 'package:firebase_remote_config/firebase_remote_config.dart';
@@ -43,13 +45,28 @@ class FirebaseInitializer {
   /// Initialize Firebase Crashlytics
   static Future<void> _initializeCrashlytics() async {
     try {
-      // Pass all uncaught errors to Crashlytics
-      FlutterError.onError = FirebaseCrashlytics.instance.recordFlutterError;
-      // Pass all uncaught asynchronous errors to Crashlytics
-      PlatformDispatcher.instance.onError = (error, stack) {
-        FirebaseCrashlytics.instance.recordError(error, stack, fatal: true);
-        return true;
-      };
+      if (FlutterError.onError == FlutterError.dumpErrorToConsole) {
+        // Pass all uncaught framework errors to Crashlytics (if not overridden).
+        FlutterError.onError = (FlutterErrorDetails details) {
+          unawaited(
+            FirebaseCrashlytics.instance.recordFlutterError(details),
+          );
+        };
+      }
+
+      if (PlatformDispatcher.instance.onError == null) {
+        // Pass all uncaught async errors to Crashlytics (if not overridden).
+        PlatformDispatcher.instance.onError = (error, stack) {
+          unawaited(
+            FirebaseCrashlytics.instance.recordError(
+              error,
+              stack,
+              fatal: true,
+            ),
+          );
+          return true;
+        };
+      }
 
       // Enable Crashlytics collection
 

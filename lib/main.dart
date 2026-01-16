@@ -5,6 +5,7 @@ import 'package:flutter_task_app/core/di/firebase_injection.dart'
 import 'package:flutter_task_app/core/di/injection_container.dart' as di;
 import 'package:flutter_task_app/core/error/global_error_handler.dart';
 import 'package:flutter_task_app/core/my_app/my_app.dart';
+import 'package:flutter_task_app/core/services/settings_service.dart';
 import 'package:flutter_task_app/core/utils/constants/app_analytics_events.dart';
 import 'package:flutter_task_app/features/firebase/domain/entities/analytics_event_entity.dart';
 import 'package:flutter_task_app/features/firebase/domain/usecases/analytics/log_analytics_event_usecase.dart';
@@ -20,6 +21,8 @@ Future<void> main() async {
   try {
     await di.init();
     await firebase_di.init();
+    final settings = SettingsService();
+    await settings.initialize();
     debugPrint(
       '=================Dependency injection initialized successfully=================',
     );
