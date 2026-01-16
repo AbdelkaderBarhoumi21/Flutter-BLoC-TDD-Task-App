@@ -24,6 +24,13 @@ Future<void> init() async {
       updateTask: sl(),
       deleteTask: sl(),
       logAnalyticsEventUseCase: sl(),
+      logErrorUseCase: sl(),
+      logMessageUseCase: sl(),
+      setCustomKeyUseCase: sl(),
+      startTraceUseCase: sl(),
+      stopTraceUseCase: sl(),
+      addTraceMetricUseCase: sl(),
+      getConfigValueUseCase: sl()
     ),
   );
 

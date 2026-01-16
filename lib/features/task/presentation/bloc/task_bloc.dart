@@ -1,8 +1,16 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_task_app/core/usecases/usescase.dart';
 import 'package:flutter_task_app/core/utils/constants/app_analytics_events.dart';
+import 'package:flutter_task_app/core/utils/constants/app_config_keys.dart';
 import 'package:flutter_task_app/features/firebase/domain/entities/analytics_event_entity.dart';
 import 'package:flutter_task_app/features/firebase/domain/usecases/analytics/log_analytics_event_usecase.dart';
+import 'package:flutter_task_app/features/firebase/domain/usecases/crashlytics/log_error_usecase.dart';
+import 'package:flutter_task_app/features/firebase/domain/usecases/crashlytics/log_message_usecase.dart';
+import 'package:flutter_task_app/features/firebase/domain/usecases/crashlytics/set_custom_key_usecase.dart';
+import 'package:flutter_task_app/features/firebase/domain/usecases/performance/add_trace_metric_usecase.dart';
+import 'package:flutter_task_app/features/firebase/domain/usecases/performance/start_trace_usecase.dart';
+import 'package:flutter_task_app/features/firebase/domain/usecases/performance/stop_trace_usecase.dart';
+import 'package:flutter_task_app/features/firebase/domain/usecases/remote_config/get_config_value_usecase.dart';
 import 'package:flutter_task_app/features/task/domain/usecases/add_task.dart';
 import 'package:flutter_task_app/features/task/domain/usecases/delete_task.dart';
 import 'package:flutter_task_app/features/task/domain/usecases/get_tasks.dart';
@@ -17,13 +25,36 @@ class TaskBloc extends Bloc<TaskEvent, TaskState> {
     required this.updateTask,
     required this.deleteTask,
     required this.logAnalyticsEventUseCase,
+    required this.logErrorUseCase,
+    required this.logMessageUseCase,
+    required this.setCustomKeyUseCase,
+    required this.startTraceUseCase,
+    required this.stopTraceUseCase,
+    required this.addTraceMetricUseCase,
+    required this.getConfigValueUseCase,
   }) : super(const TaskInitial()) {
     on<LoadTaskEvent>(_onLoadTasks);
     on<AddTaskEvent>(_onAddTask);
     on<UpdateTaskEvent>(_onUpdateTask);
     on<DeleteTaskEvent>(_onDeleteTask);
   }
+  // Firebase Analytics
   final LogAnalyticsEventUseCase logAnalyticsEventUseCase;
+
+  // Firebase Crashlytics
+  final LogErrorUseCase logErrorUseCase;
+  final LogMessageUseCase logMessageUseCase;
+  final SetCustomKeyUseCase setCustomKeyUseCase;
+
+  // Firebase Performance
+  final StartTraceUseCase startTraceUseCase;
+  final StopTraceUseCase stopTraceUseCase;
+  final AddTraceMetricUseCase addTraceMetricUseCase;
+
+  // Remote config
+  final GetConfigValueUseCase getConfigValueUseCase;
+
+  // Task use case
   final GetTasks getTasks;
   final AddTask addTask;
   final UpdateTask updateTask;
@@ -33,21 +64,101 @@ class TaskBloc extends Bloc<TaskEvent, TaskState> {
     LoadTaskEvent event,
     Emitter<TaskState> emit,
   ) async {
+    // Log breadcrumb  =>  events/actions that happened before a crash or error occurred. to helps you understand what the user was doing
+    await logMessageUseCase(const LogMessageParams(message: 'Loading tasks'));
+
+    // Start performance trace
+    final traceResult = await startTraceUseCase(
+      const StartTraceParams(name: 'load_tasks'),
+    );
+
     emit(const TaskLoading());
+
+    // Get max tasks from remote config
+    final maxTasksResult = await getConfigValueUseCase(
+      const GetConfigValueParams(key: AppConfigKeys.maxTasksPerUser),
+    );
+    final maxTasks = maxTasksResult.fold((f) => 100, (v) => v as int);
+
+    // Set Crashlytics context
+    await setCustomKeyUseCase(
+      SetCustomKeyParams(key: 'max_tasks', value: maxTasks),
+    );
     final result = await getTasks(const NoParams());
     result.fold(
-      (failure) => emit(TaskError(failure.message)),
-      (tasks) => emit(TaskLoaded(tasks)),
+      (failure) async {
+        // Log error
+        await logErrorUseCase(
+          LogErrorParams(error: failure, reason: 'Failed to load tasks'),
+        );
+        // Log analytics
+
+        await logAnalyticsEventUseCase(
+          LogAnalyticsEventParams(
+            event: AnalyticsEventEntity(
+              name: AppAnalyticsEvents.errorOccurred,
+              parameters: {
+                'error_type': 'load_tasks_failed',
+                'error_message': failure.message,
+              },
+            ),
+          ),
+        );
+        // Stop trace
+        if (traceResult.isRight()) {
+          final trace = traceResult.getOrElse(() => throw Exception());
+          await stopTraceUseCase(StopTraceParams(trace: trace));
+        }
+
+        emit(TaskError(failure.message));
+      },
+      (tasks) async {
+        //Add metric to trace
+        if (traceResult.isRight()) {
+          final trace = traceResult.getOrElse(() => throw Exception());
+          await addTraceMetricUseCase(
+            AddTraceMetricParams(
+              trace: trace,
+              metricName: 'tasks_loaded',
+              value: tasks.length,
+            ),
+          );
+          await stopTraceUseCase(StopTraceParams(trace: trace));
+        }
+        // Log analytics
+        await logAnalyticsEventUseCase(
+          LogAnalyticsEventParams(
+            event: AnalyticsEventEntity(
+              name: 'tasks_loaded',
+              parameters: {'task_count': tasks.length},
+            ),
+          ),
+        );
+        emit(TaskLoaded(tasks));
+      },
     );
   }
 
   Future<void> _onAddTask(AddTaskEvent event, Emitter<TaskState> emit) async {
+    // Log breadcrumb
+    await logMessageUseCase(
+      LogMessageParams(message: 'Adding task: ${event.task.title}'),
+    );
+    // Start trace
+    final traceResult = await startTraceUseCase(
+      const StartTraceParams(name: 'add_task'),
+    );
+
     emit(const TaskLoading());
     final result = await addTask(AddTaskParams(taskEntity: event.task));
     result.fold(
-      (failure) {
+      (failure) async {
+        // Log error
+        await logErrorUseCase(
+          LogErrorParams(error: failure, reason: 'Failed to add task'),
+        );
         // Log error event
-        logAnalyticsEventUseCase(
+        await logAnalyticsEventUseCase(
           LogAnalyticsEventParams(
             event: AnalyticsEventEntity(
               name: AppAnalyticsEvents.errorOccurred,
@@ -58,11 +169,17 @@ class TaskBloc extends Bloc<TaskEvent, TaskState> {
             ),
           ),
         );
+        // Stop trace
+        if (traceResult.isRight()) {
+          final trace = traceResult.getOrElse(() => throw Exception());
+          await stopTraceUseCase(StopTraceParams(trace: trace));
+        }
+
         emit(TaskError(failure.message));
       },
-      (_) {
+      (_) async {
         // Log success event
-        logAnalyticsEventUseCase(
+        await logAnalyticsEventUseCase(
           LogAnalyticsEventParams(
             event: AnalyticsEventEntity(
               name: AppAnalyticsEvents.taskAdded,
