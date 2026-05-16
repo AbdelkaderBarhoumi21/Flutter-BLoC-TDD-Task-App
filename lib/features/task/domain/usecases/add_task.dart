@@ -21,7 +21,7 @@ class AddTask implements UseCase<TaskEntity, AddTaskParams> {
       params.taskEntity.description,
     );
     if (titleError != null) {
-      return left(ValidationFailure(titleError));
+      return Left(ValidationFailure(titleError));
     }
 
     if (descError != null) {
